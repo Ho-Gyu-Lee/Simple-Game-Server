@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "IOCompletionPort.h"
-#include "OverlappedIOContext.h"
 
 CIOCompletionPort::CIOCompletionPort()
 	: _CompletionPort(NULL)

@@ -24,9 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="OverlappedIOContext.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="IOCompletionPort.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="OverlappedIOContext.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="IOCompletionPort.cpp">
