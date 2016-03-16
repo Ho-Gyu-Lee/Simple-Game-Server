@@ -5,19 +5,28 @@
 CClientSession::CClientSession()
 	: _Socket(INVALID_SOCKET)
 {
-	ZeroMemory(&_ClientAddr, sizeof(SOCKADDR_IN));
 
-	ZeroMemory(&_AcceptOverlapped, sizeof(OVERLAPPED_BASE));
-	ZeroMemory(&_ReadOverlapped, sizeof(OVERLAPPED_BASE));
-	ZeroMemory(&_SendOverlapped, sizeof(OVERLAPPED_BASE));
-
-	_AcceptOverlapped._Mode = OVERLAPPED_ACCEPT;
-	_ReadOverlapped._Mode	= OVERLAPPED_READ;
-	_SendOverlapped._Mode	= OVERLAPPED_WRITE;
 }
 
 CClientSession::~CClientSession()
 {
+}
+
+void CClientSession::Initailize()
+{
+	ZeroMemory(&_ClientAddr, sizeof(SOCKADDR_IN));
+
+	ZeroMemory(&_AcceptOverlapped,		sizeof(OVERLAPPED_BASE));
+	ZeroMemory(&_ZeroReadOverlapped,	sizeof(OVERLAPPED_BASE));
+	ZeroMemory(&_ReadOverlapped,		sizeof(OVERLAPPED_BASE));
+	ZeroMemory(&_SendOverlapped,		sizeof(OVERLAPPED_BASE));
+	ZeroMemory(&_DisconnectOverlapped,	sizeof(OVERLAPPED_BASE));
+
+	_AcceptOverlapped._Mode		= OVERLAPPED_ACCEPT;
+	_ZeroReadOverlapped._Mode	= OVERLAPPED_ZERO_READ;
+	_ReadOverlapped._Mode		= OVERLAPPED_READ;
+	_SendOverlapped._Mode		= OVERLAPPED_WRITE;
+	_DisconnectOverlapped._Mode = OVERLAPPED_DISCONNECT;
 }
 
 bool CClientSession::PostAccept(SOCKET listenSocket)
@@ -46,9 +55,41 @@ bool CClientSession::PostAccept(SOCKET listenSocket)
 	return true;
 }
 
-void CClientSession::AcceptCompletion()
+bool CClientSession::AcceptCompletion()
 {
+	int opt = 0;
+	if (SOCKET_ERROR == setsockopt(_Socket, SOL_SOCKET, SO_RCVBUF, (const char*)&opt, sizeof(int)))
+	{
+		return false;
+	}
 
+	return true;
+}
+
+// Non-Paged Pool
+bool CClientSession::ZeroByteReceive()
+{
+	DWORD dwSize = 0;
+	DWORD dwFlag = 0;
+
+	WSABUF	WsaBuf;
+	WsaBuf.buf = NULL;
+	WsaBuf.len = 0;
+
+	int result = WSARecv( _Socket
+						, &WsaBuf
+						, 1
+						, &dwSize
+						, &dwFlag
+						, (LPOVERLAPPED)&_ZeroReadOverlapped
+						, NULL);
+
+	if (result == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING && WSAGetLastError() != WSAEWOULDBLOCK)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 bool CClientSession::PostReceive()
@@ -94,6 +135,19 @@ bool CClientSession::PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize)
 
 	if (result == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING && WSAGetLastError() != WSAEWOULDBLOCK)
 	{
+		return false;
+	}
+
+	return true;
+}
+
+bool CClientSession::Release()
+{
+	bool result = TransmitFile(_Socket, NULL, NULL, NULL, (LPOVERLAPPED)&_DisconnectOverlapped, NULL, TF_DISCONNECT | TF_REUSE_SOCKET);
+
+	if (result == false)
+	{
+		closesocket(_Socket);
 		return false;
 	}
 
