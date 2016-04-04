@@ -49,7 +49,7 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 
 void CNetwork::Run()
 {
-	_ClientSessionManager->GetClientSessions()->PostAccept(_ListenSocket);
+	//_ClientSessionManager->GetClientSessions()->PostAccept(_ListenSocket);
 
 	while (true)
 	{
