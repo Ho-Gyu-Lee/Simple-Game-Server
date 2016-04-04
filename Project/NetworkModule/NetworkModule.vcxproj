@@ -145,12 +145,14 @@
     <ClCompile Include="..\..\Source\NetworkModule\ClientSession.cpp" />
     <ClCompile Include="..\..\Source\NetworkModule\ClientSessionManager.cpp" />
     <ClCompile Include="..\..\Source\NetworkModule\IOCompletionPort.cpp" />
+    <ClCompile Include="..\..\Source\NetworkModule\Network.cpp" />
     <ClCompile Include="..\..\Source\NetworkModule\NetworkSession.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\NetworkModule\ClientSession.h" />
     <ClInclude Include="..\..\Include\NetworkModule\ClientSessionManager.h" />
     <ClInclude Include="..\..\Include\NetworkModule\IOCompletionPort.h" />
+    <ClInclude Include="..\..\Include\NetworkModule\Network.h" />
     <ClInclude Include="..\..\Include\NetworkModule\NetworkSession.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

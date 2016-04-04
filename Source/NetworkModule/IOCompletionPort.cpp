@@ -8,6 +8,7 @@ CIOCompletionPort::CIOCompletionPort()
 
 CIOCompletionPort::~CIOCompletionPort()
 {
+	CloseHandle(_CompletionPort);
 }
 
 bool CIOCompletionPort::Initialize()
@@ -15,15 +16,6 @@ bool CIOCompletionPort::Initialize()
 	_CompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 	if (_CompletionPort == NULL)
 		return false;
-
-	SYSTEM_INFO systemInfo;
-	GetSystemInfo(&systemInfo);
-
-	for (DWORD i = 0; i < systemInfo.dwNumberOfProcessors * 2 + 1; i++)
-	{
-		unsigned int threadID = 0;
-		HANDLE workerThread = (HANDLE)_beginthreadex(NULL, 0, IoWorkerThread, _CompletionPort, 0, &threadID);
-	}
 
 	return false;
 }
@@ -48,22 +40,7 @@ bool CIOCompletionPort::PostIoCompletion(LPOVERLAPPED overlapped, ULONG_PTR comp
 	return true;
 }
 
-unsigned int WINAPI CIOCompletionPort::IoWorkerThread(LPVOID param)
+int CIOCompletionPort::GetIoCompletionStatus(DWORD* numberOfByteTransfered, ULONG_PTR completionKey, LPOVERLAPPED overlapped)
 {
-	int			 result = 0;
-	DWORD		 numberOfByteTransfered = 0;
-	ULONG_PTR	 completionKey = NULL;
-	LPOVERLAPPED overlapped = NULL;
-	HANDLE		 iocpHandle = (HANDLE)param;
-
-	while (true)
-	{
-		result = GetQueuedCompletionStatus( iocpHandle
-										  , &numberOfByteTransfered
-										  , (PULONG_PTR)&completionKey
-										  , &overlapped
-										  , INFINITE);
-	}
-
-	return result;
+	return GetQueuedCompletionStatus(_CompletionPort, numberOfByteTransfered, (PULONG_PTR)&completionKey, &overlapped, INFINITE);
 }
