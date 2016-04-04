@@ -6,10 +6,17 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkCommon", "Project\NetworkCommon\NetworkCommon.vcxproj", "{A7C75E85-0BE0-456E-857D-D888876719AF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkModule", "Project\NetworkModule\NetworkModule.vcxproj", "{C0E8BDB8-DEA3-440C-876F-4C9A96931183}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A7C75E85-0BE0-456E-857D-D888876719AF} = {A7C75E85-0BE0-456E-857D-D888876719AF}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{27E14153-544E-4892-9632-CC6CEEB8A08E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameServerSample", "Sample\GameServerSample\GameServerSample.vcxproj", "{E8BF2A95-8488-4EE0-B50D-C18D4411192F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A7C75E85-0BE0-456E-857D-D888876719AF} = {A7C75E85-0BE0-456E-857D-D888876719AF}
+		{C0E8BDB8-DEA3-440C-876F-4C9A96931183} = {C0E8BDB8-DEA3-440C-876F-4C9A96931183}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

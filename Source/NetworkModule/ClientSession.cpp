@@ -29,7 +29,7 @@ void CClientSession::Initailize()
 
 bool CClientSession::PostAccept(SOCKET listenSocket)
 {
-	DWORD dwSize = 0;
+/*	DWORD dwSize = 0;
 
 	WSABUF	WsaBuf;
 	WsaBuf.buf = (CHAR*)_RecvBuffer;
@@ -49,7 +49,7 @@ bool CClientSession::PostAccept(SOCKET listenSocket)
 			return false;
 		}
 	}
-
+	*/
 	return true;
 }
 
@@ -146,14 +146,14 @@ bool CClientSession::PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize)
 }
 
 bool CClientSession::Release()
-{
+{/*
 	bool result = TransmitFile(_Socket, NULL, NULL, NULL, (LPOVERLAPPED)&_DisconnectOverlapped, NULL, TF_DISCONNECT | TF_REUSE_SOCKET);
 
 	if (result == false)
 	{
 		closesocket(_Socket);
 		return false;
-	}
+	}*/
 
 	return true;
 }
