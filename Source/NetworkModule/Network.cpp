@@ -41,6 +41,10 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 	if (SOCKET_ERROR == bind(_ListenSocket, (SOCKADDR*)&serveraddr, sizeof(serveraddr)))
 		return false;
 
+	std::string ip;
+	u_short port1;
+	GetLocalAddress(_ListenSocket, ip, port1);
+
 	if (SOCKET_ERROR == listen(_ListenSocket, SOMAXCONN))
 		return false;
 
@@ -49,7 +53,7 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 
 void CNetwork::Run()
 {
-	//_ClientSessionManager->GetClientSessions()->PostAccept(_ListenSocket);
+	_ClientSessionManager->AcceptClientSessions();
 
 	while (true)
 	{
@@ -70,4 +74,47 @@ void CNetwork::Release()
 	}
 
 	WSACleanup();
+}
+
+void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context,
+	PVOID Overlapped, ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io)
+{
+
+}
+
+bool CNetwork::GetLocalAddress(SOCKET socket, std::string& ip, u_short& port)
+{
+	sockaddr_in6 addr6;
+	ZeroMemory(&addr6, sizeof(addr6));
+	int size = sizeof(addr6);
+
+	char buff[INET6_ADDRSTRLEN] = { 0, };
+
+	if (0 == getsockname(socket, reinterpret_cast<sockaddr*>(&addr6), &size))
+	{
+		if (size == sizeof(sockaddr_in6))
+		{
+			port = ntohs(addr6.sin6_port);
+			inet_ntop(AF_INET6, &addr6.sin6_addr, buff, INET6_ADDRSTRLEN);
+
+			ip = buff;
+		}
+		else if (size == sizeof(sockaddr_in))
+		{
+			sockaddr_in* pAddr4 = reinterpret_cast<sockaddr_in*>(&addr6);
+
+			port = ntohs(pAddr4->sin_port);
+			inet_ntop(AF_INET, &pAddr4->sin_addr, buff, INET_ADDRSTRLEN);
+
+			ip = buff;
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	return false;
 }

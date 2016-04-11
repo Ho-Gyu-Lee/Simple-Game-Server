@@ -3,7 +3,7 @@
 CClientSession::CClientSession()
 	: _Socket(INVALID_SOCKET)
 {
-
+	Initailize();
 }
 
 CClientSession::~CClientSession()

@@ -25,6 +25,9 @@ public:
 	bool Release();
 
 public:
+	SOCKET GetSocket() { return _Socket; }
+
+public:
 	CClientSession();
 	~CClientSession();
 };
