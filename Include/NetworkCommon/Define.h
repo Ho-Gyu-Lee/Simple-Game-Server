@@ -7,6 +7,7 @@
 #include <mswsock.h>
 #include <process.h>
 #include <queue>
+#include <iostream>
 
 #define MAX_CONNECTION	10000
 #define MAX_BUFFER_SIZE 1024

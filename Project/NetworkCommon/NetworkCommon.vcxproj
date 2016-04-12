@@ -147,9 +147,13 @@
   <ItemGroup>
     <ClInclude Include="..\..\Include\NetworkCommon\DataBuffer.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Define.h" />
+    <ClInclude Include="SRWLock.h" />
+    <ClInclude Include="Synchronized.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\NetworkCommon\DataBuffer.cpp" />
+    <ClCompile Include="SRWLock.cpp" />
+    <ClCompile Include="Synchronized.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

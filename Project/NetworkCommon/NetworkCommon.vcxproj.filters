@@ -24,9 +24,21 @@
     <ClInclude Include="..\..\Include\NetworkCommon\Define.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Synchronized.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SRWLock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\NetworkCommon\DataBuffer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Synchronized.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SRWLock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

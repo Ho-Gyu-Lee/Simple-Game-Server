@@ -13,6 +13,8 @@ private:
 	CIOCompletionPort*	   _IOCompletionPort;
 	CClientSessionManager* _ClientSessionManager;
 
+	TP_IO* _TPIO;
+
 public:
 	bool Initialize(unsigned short port, CClientSessionManager* clientSessionManager);
 	void Run();
@@ -21,6 +23,7 @@ public:
 private:
 	static void CALLBACK IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context, PVOID Overlapped, ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io);
 	bool GetLocalAddress(SOCKET socket, std::string& ip, u_short& port);
+
 public:
 	CNetwork();
 	~CNetwork();

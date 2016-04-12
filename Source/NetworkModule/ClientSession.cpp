@@ -25,6 +25,12 @@ void CClientSession::Initailize()
 	_ReadOverlapped._Mode		= OVERLAPPED_READ;
 	_SendOverlapped._Mode		= OVERLAPPED_WRITE;
 	_DisconnectOverlapped._Mode = OVERLAPPED_DISCONNECT;
+
+	_Socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (_Socket != INVALID_SOCKET)
+	{
+		std::cout << WSAGetLastError() << std::endl;
+	}
 }
 
 bool CClientSession::PostAccept(SOCKET listenSocket)
@@ -32,8 +38,8 @@ bool CClientSession::PostAccept(SOCKET listenSocket)
 	DWORD dwSize = 0;
 
 	WSABUF	WsaBuf;
-	WsaBuf.buf = (CHAR*)_RecvBuffer;
-	WsaBuf.len = MAX_BUFFER_SIZE;
+	WsaBuf.buf = NULL;
+	WsaBuf.len = 0;
 
 	if (FALSE == AcceptEx( listenSocket
 						 , _Socket
@@ -46,6 +52,8 @@ bool CClientSession::PostAccept(SOCKET listenSocket)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
+			if(WSAENOTSOCK == WSAGetLastError())
+				std::cout << WSAGetLastError() << std::endl;
 			return false;
 		}
 	}

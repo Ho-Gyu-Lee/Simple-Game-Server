@@ -5,6 +5,7 @@
 
 CNetwork::CNetwork()
 	: _ListenSocket(INVALID_SOCKET)
+	, _TPIO(NULL)
 	, _IOCompletionPort(NULL)
 	, _ClientSessionManager(NULL)
 {
@@ -27,11 +28,6 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 	if (_ListenSocket == INVALID_SOCKET)
 		return false;
 
-	_IOCompletionPort = new CIOCompletionPort;
-	_IOCompletionPort->Initialize();
-
-	_IOCompletionPort->RegisterIoCompletion((HANDLE)_ListenSocket, NULL);
-
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
@@ -41,9 +37,11 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 	if (SOCKET_ERROR == bind(_ListenSocket, (SOCKADDR*)&serveraddr, sizeof(serveraddr)))
 		return false;
 
-	std::string ip;
-	u_short port1;
-	GetLocalAddress(_ListenSocket, ip, port1);
+	_TPIO = CreateThreadpoolIo(reinterpret_cast<HANDLE>(_ListenSocket), CNetwork::IoCompletionCallback, NULL, NULL);
+	if (_TPIO == NULL)
+		return false;
+
+	StartThreadpoolIo(_TPIO);
 
 	if (SOCKET_ERROR == listen(_ListenSocket, SOMAXCONN))
 		return false;
@@ -53,15 +51,9 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 
 void CNetwork::Run()
 {
-	_ClientSessionManager->AcceptClientSessions();
-
 	while (true)
 	{
-		DWORD		 numberOfByteTransfered = 0;
-		ULONG_PTR	 completionKey = NULL;
-		LPOVERLAPPED overlapped = NULL;
-
-		_IOCompletionPort->GetIoCompletionStatus(&numberOfByteTransfered, completionKey, overlapped);
+		_ClientSessionManager->AcceptClientSessions(_ListenSocket, _TPIO);
 	}
 }
 
@@ -73,13 +65,31 @@ void CNetwork::Release()
 		_IOCompletionPort = NULL;
 	}
 
+	if (_TPIO != NULL)
+	{
+		WaitForThreadpoolIoCallbacks(_TPIO, true);
+		CloseThreadpoolIo(_TPIO);
+		_TPIO = NULL;
+	}
+
 	WSACleanup();
 }
 
-void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context,
-	PVOID Overlapped, ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io)
+void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context,	PVOID Overlapped, 
+												ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io)
 {
+	std::cout << "TEST" << std::endl;
 
+	if (IoResult != ERROR_SUCCESS)
+	{
+	}
+	else
+	{
+		if (((OVERLAPPED_BASE*)Overlapped)->_Mode == OVERLAPPED_ACCEPT)
+		{
+
+		}
+	}
 }
 
 bool CNetwork::GetLocalAddress(SOCKET socket, std::string& ip, u_short& port)
