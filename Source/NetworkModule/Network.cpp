@@ -51,9 +51,11 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 
 void CNetwork::Run()
 {
+	_ClientSessionManager->AcceptClientSessions(_ListenSocket, _TPIO);
+
 	while (true)
 	{
-		_ClientSessionManager->AcceptClientSessions(_ListenSocket, _TPIO);
+		Sleep(1000);
 	}
 }
 
@@ -78,16 +80,29 @@ void CNetwork::Release()
 void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context,	PVOID Overlapped, 
 												ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io)
 {
-	std::cout << "TEST" << std::endl;
-
 	if (IoResult != ERROR_SUCCESS)
 	{
 	}
 	else
 	{
-		if (((OVERLAPPED_BASE*)Overlapped)->_Mode == OVERLAPPED_ACCEPT)
-		{
+		OVERLAPPED_BASE* overlapped_Base = (OVERLAPPED_BASE*)Overlapped;
 
+		switch (overlapped_Base->_Mode)
+		{
+		case OVERLAPPED_ACCEPT:
+			overlapped_Base->_Client->AcceptCompletion();
+			overlapped_Base->_Client->ZeroByteReceive();
+			break;
+		case OVERLAPPED_ZERO_READ:
+			overlapped_Base->_Client->PostReceive();
+			break;
+		case OVERLAPPED_READ:
+			overlapped_Base->_Client->ZeroByteReceive();
+			break;
+		case OVERLAPPED_WRITE:
+			break;
+		default:
+			break;
 		}
 	}
 }

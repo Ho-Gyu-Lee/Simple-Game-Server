@@ -10,7 +10,6 @@ private:
 
 public:
 	void PushClientSession(CClientSession* client);
-	CClientSession* GetClientSessions();
 	bool AcceptClientSessions(SOCKET listenSocket, TP_IO* io);
 
 public:

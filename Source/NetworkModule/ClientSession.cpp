@@ -3,7 +3,7 @@
 CClientSession::CClientSession()
 	: _Socket(INVALID_SOCKET)
 {
-	Initailize();
+
 }
 
 CClientSession::~CClientSession()
@@ -27,9 +27,9 @@ void CClientSession::Initailize()
 	_DisconnectOverlapped._Mode = OVERLAPPED_DISCONNECT;
 
 	_Socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
-	if (_Socket != INVALID_SOCKET)
+	if (_Socket == INVALID_SOCKET)
 	{
-		std::cout << WSAGetLastError() << std::endl;
+		// Log
 	}
 }
 
@@ -52,8 +52,6 @@ bool CClientSession::PostAccept(SOCKET listenSocket)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			if(WSAENOTSOCK == WSAGetLastError())
-				std::cout << WSAGetLastError() << std::endl;
 			return false;
 		}
 	}
