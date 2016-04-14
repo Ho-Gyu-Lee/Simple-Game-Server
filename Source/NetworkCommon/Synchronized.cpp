@@ -1,4 +1,4 @@
-#include "Synchronized.h"
+#include "NetworkCommon\Synchronized.h"
 
 CSynchronized::CSynchronized(CSectionObject* sectionObject)
 {

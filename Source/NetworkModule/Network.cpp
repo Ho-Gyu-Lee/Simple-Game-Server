@@ -101,6 +101,7 @@ void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVO
 			overlapped_Base->_Client->ZeroByteReceive();
 			break;
 		case OVERLAPPED_WRITE:
+			overlapped_Base->_Client->SendCompletion(Overlapped);
 			break;
 		case OVERLAPPED_DISCONNECT:
 			break;

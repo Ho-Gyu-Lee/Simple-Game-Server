@@ -4,14 +4,21 @@
 class CClientSession
 {
 private:
+	struct SEND_OVERLAPPED : OVERLAPPED_BASE
+	{
+		CHAR* _SendBuffer;
+	};
+
+private:
 	SOCKET			_Socket;
 	SOCKADDR_IN		_ClientAddr;
 
 	OVERLAPPED_BASE		_ZeroReadOverlapped;
 	OVERLAPPED_BASE		_ReadOverlapped;
-	OVERLAPPED_BASE		_SendOverlapped;
 	OVERLAPPED_BASE		_AcceptOverlapped;
 	OVERLAPPED_BASE		_DisconnectOverlapped;
+
+	SEND_OVERLAPPED		_SendOverlapped;
 
 	TP_IO*		_TPIO;
 
@@ -25,6 +32,7 @@ public:
 	bool ZeroByteReceive();
 	bool PostReceive();
 	bool PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize);
+	void SendCompletion(PVOID overlapped);
 	bool Release();
 
 public:

@@ -147,13 +147,17 @@
   <ItemGroup>
     <ClInclude Include="..\..\Include\NetworkCommon\DataBuffer.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Define.h" />
-    <ClInclude Include="SRWLock.h" />
-    <ClInclude Include="Synchronized.h" />
+    <ClInclude Include="..\..\Include\NetworkCommon\Log.h" />
+    <ClInclude Include="..\..\Include\NetworkCommon\Singleton.h" />
+    <ClInclude Include="..\..\Include\NetworkCommon\SRWLock.h" />
+    <ClInclude Include="..\..\Include\NetworkCommon\Synchronized.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\NetworkCommon\DataBuffer.cpp" />
-    <ClCompile Include="SRWLock.cpp" />
-    <ClCompile Include="Synchronized.cpp" />
+    <ClCompile Include="..\..\Source\NetworkCommon\Log.cpp" />
+    <ClCompile Include="..\..\Source\NetworkCommon\Singleton.cpp" />
+    <ClCompile Include="..\..\Source\NetworkCommon\SRWLock.cpp" />
+    <ClCompile Include="..\..\Source\NetworkCommon\Synchronized.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

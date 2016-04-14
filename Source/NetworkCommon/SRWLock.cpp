@@ -1,4 +1,4 @@
-#include "SRWLock.h"
+#include "NetworkCommon\SRWLock.h"
 
 CSRWLock::CSRWLock()
 {

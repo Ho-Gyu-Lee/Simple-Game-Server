@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "NetworkCommon\Log.h"
 #include "NetworkModule\Network.h"
 #include "NetworkModule\ClientSession.h"
 #include "NetworkModule\ClientSessionManager.h"
@@ -14,6 +15,9 @@ int main()
 	{
 		clientSessionManager->PushClientSession(new CClientSession);
 	}
+
+	CLog::GetInstance()->Trace("TEST");
+	//TRACE("TEST");
 
 	CNetwork* network = new CNetwork;
 	network->Initialize(20020, clientSessionManager);
