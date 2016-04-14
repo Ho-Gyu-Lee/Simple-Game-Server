@@ -1,4 +1,5 @@
 #pragma once
+#include "NetworkCommon\Define.h"
 
 template<typename T>
 class CSingleton
@@ -27,7 +28,9 @@ public:
 	}
 
 public:
-	CSingleton();
-	~CSingleton();
+	CSingleton() {}
+	~CSingleton() {}
 };
 
+template<typename T>
+T* CSingleton<T>::_Instance;

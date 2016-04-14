@@ -1,6 +1,7 @@
-#include "NetworkModule/Network.h"
-#include "NetworkModule/Packet.h"
-#include "NetworkModule/ClientSession.h"
+#include "NetworkCommon\Log.h"
+#include "NetworkModule\Network.h"
+#include "NetworkModule\Packet.h"
+#include "NetworkModule\ClientSession.h"
 
 CClientSession::CClientSession()
 	: _Socket(INVALID_SOCKET)
@@ -36,17 +37,18 @@ void CClientSession::Initailize()
 	_Socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (_Socket == INVALID_SOCKET)
 	{
-		// Log
+		LOG_ERROR_MSG("Failed Socket Initailize")
 	}
 }
 
 void CClientSession::RecviePacketProcessing(ULONG NumberOfBytesTransferred)
 {
-	PostSend(_RecvBuffer, NumberOfBytesTransferred);
-	/*
+	// 에코 처리 ( 추후 CPacket Class를 이용하여 처리 작업 추가 )
 	LONG packetSize = NumberOfBytesTransferred;
 	while (true)
 	{
+		if (packetSize == 0) break;
+
 		CHAR* sendBuffer = new CHAR[8];
 		CopyMemory(sendBuffer, &_RecvBuffer[_EndBufferIndex], 8);
 
@@ -58,7 +60,7 @@ void CClientSession::RecviePacketProcessing(ULONG NumberOfBytesTransferred)
 		if (packetSize < 0)
 		{
 			_EndBufferIndex -= 8;
-			packetSize += 8;
+			packetSize		+= 8;
 			break;
 		}
 	}
@@ -67,7 +69,7 @@ void CClientSession::RecviePacketProcessing(ULONG NumberOfBytesTransferred)
 			  , &_RecvBuffer[_EndBufferIndex]
 			  , MAX_BUFFER_SIZE - _EndBufferIndex);
 
-	_EndBufferIndex = packetSize;*/
+	_EndBufferIndex = packetSize;
 }
 
 bool CClientSession::PostAccept(SOCKET listenSocket, TP_IO* io)
@@ -181,6 +183,7 @@ bool CClientSession::PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize)
 	WsaBuf.buf = pSendBuffer;
 	WsaBuf.len = dwSendBufferSize;
 
+	// 추후 POOL을 만들어서 처리 한다.
 	SEND_OVERLAPPED* sendOverlapped = new SEND_OVERLAPPED;
 	ZeroMemory(sendOverlapped, sizeof(SEND_OVERLAPPED));
 
@@ -208,7 +211,7 @@ bool CClientSession::PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize)
 void CClientSession::SendCompletion(PVOID overlapped)
 {
 	SEND_OVERLAPPED* sendOverlapped = (SEND_OVERLAPPED*)overlapped;
-	//delete sendOverlapped->_SendBuffer;
+	delete[] sendOverlapped->_SendBuffer;
 	delete sendOverlapped;
 }
 

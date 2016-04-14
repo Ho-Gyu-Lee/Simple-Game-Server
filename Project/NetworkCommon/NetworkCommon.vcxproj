@@ -155,7 +155,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\Source\NetworkCommon\DataBuffer.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\Log.cpp" />
-    <ClCompile Include="..\..\Source\NetworkCommon\Singleton.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\SRWLock.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\Synchronized.cpp" />
   </ItemGroup>

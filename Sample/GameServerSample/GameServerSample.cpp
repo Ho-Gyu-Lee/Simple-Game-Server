@@ -16,12 +16,17 @@ int main()
 		clientSessionManager->PushClientSession(new CClientSession);
 	}
 
-	CLog::GetInstance()->Trace("TEST");
-	//TRACE("TEST");
-
 	CNetwork* network = new CNetwork;
-	network->Initialize(20020, clientSessionManager);
+	
+	if (false == network->Initialize(20020, clientSessionManager))
+	{
+		LOG_ERROR_MSG("Failed Server Initialize");
+	}
+
+	LOG_MSG("Start Server");
 	network->Run();
+
+	LOG_SHUTDOWN;
 
     return 0;
 }

@@ -8,6 +8,8 @@
 #include <process.h>
 #include <queue>
 #include <iostream>
+#include <string>
+#include <time.h>
 
 #define MAX_CONNECTION	10000
 #define MAX_BUFFER_SIZE 1024

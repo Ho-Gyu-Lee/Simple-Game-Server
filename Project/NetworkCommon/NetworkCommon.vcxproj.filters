@@ -44,9 +44,6 @@
     <ClCompile Include="..\..\Source\NetworkCommon\Log.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NetworkCommon\Singleton.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\NetworkCommon\SRWLock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>

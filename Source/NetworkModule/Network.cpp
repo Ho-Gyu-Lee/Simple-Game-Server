@@ -51,6 +51,7 @@ bool CNetwork::Initialize(unsigned short port, CClientSessionManager* clientSess
 
 void CNetwork::Run()
 {
+	// 임시 로직 ( 재사용 로직으로 변경 )
 	_ClientSessionManager->AcceptClientSessions(_ListenSocket, _TPIO);
 
 	while (true)
@@ -75,40 +76,6 @@ void CNetwork::Release()
 	}
 
 	WSACleanup();
-}
-
-void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context,	PVOID Overlapped, 
-												ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io)
-{
-	if (IoResult != ERROR_SUCCESS)
-	{
-	}
-	else
-	{
-		OVERLAPPED_BASE* overlapped_Base = (OVERLAPPED_BASE*)Overlapped;
-
-		switch (overlapped_Base->_Mode)
-		{
-		case OVERLAPPED_ACCEPT:
-			overlapped_Base->_Client->AcceptCompletion();
-			overlapped_Base->_Client->ZeroByteReceive();
-			break;
-		case OVERLAPPED_ZERO_READ:
-			overlapped_Base->_Client->PostReceive();
-			break;
-		case OVERLAPPED_READ:
-			overlapped_Base->_Client->RecviePacketProcessing(NumberOfBytesTransferred);
-			overlapped_Base->_Client->ZeroByteReceive();
-			break;
-		case OVERLAPPED_WRITE:
-			overlapped_Base->_Client->SendCompletion(Overlapped);
-			break;
-		case OVERLAPPED_DISCONNECT:
-			break;
-		default:
-			break;
-		}
-	}
 }
 
 bool CNetwork::GetLocalAddress(SOCKET socket, std::string& ip, u_short& port)
@@ -146,4 +113,48 @@ bool CNetwork::GetLocalAddress(SOCKET socket, std::string& ip, u_short& port)
 	}
 
 	return false;
+}
+
+void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context,	PVOID Overlapped, 
+												ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io)
+{
+	OVERLAPPED_BASE* overlapped_Base = (OVERLAPPED_BASE*)Overlapped;
+
+	if (IoResult != ERROR_SUCCESS)
+	{
+		if (overlapped_Base == NULL) return;
+		if (GetLastError() == WAIT_TIMEOUT) return;
+
+		if (overlapped_Base->_Mode == OVERLAPPED_ZERO_READ ||
+			overlapped_Base->_Mode == OVERLAPPED_READ	   ||
+			overlapped_Base->_Mode == OVERLAPPED_WRITE)
+		{
+			overlapped_Base->_Client->Release();
+		}
+	}
+	else
+	{
+		switch (overlapped_Base->_Mode)
+		{
+		case OVERLAPPED_ACCEPT:
+			overlapped_Base->_Client->AcceptCompletion();
+			overlapped_Base->_Client->ZeroByteReceive();
+			break;
+		case OVERLAPPED_ZERO_READ:
+			overlapped_Base->_Client->PostReceive();
+			break;
+		case OVERLAPPED_READ:
+			overlapped_Base->_Client->RecviePacketProcessing(NumberOfBytesTransferred);
+			overlapped_Base->_Client->ZeroByteReceive();
+			break;
+		case OVERLAPPED_WRITE:
+			overlapped_Base->_Client->SendCompletion(Overlapped);
+			break;
+		case OVERLAPPED_DISCONNECT:
+			// 추후 ClientSessionManager 다시 반환 하는 로직 추가
+			break;
+		default:
+			break;
+		}
+	}
 }

@@ -10,13 +10,17 @@ private:
 	CSectionObject	_LogSec;
 
 public:
-	void Trace(const char * msg, ...);
+	void Log(const char * msg, ...);
 	void Error(const char * fileName, const char * funcName, int line, const char * msg, ...);
+
+private:
+	std::string CurrentDateTime();
 
 public:
 	CLog();
 	~CLog();
 };
 
-//#define TRACE(msg, ...) CLog::GetInstance()->Trace(msg, __VA_ARGS__);
-//#define ERROR_MSG(msg, ...) CLog::GetInstance()->Error(__FILE__, __FUNCTION__, __LINE__, msg, __VA_ARGS__);
+#define LOG_MSG(msg, ...) CLog::GetInstance()->Log(msg, __VA_ARGS__);
+#define LOG_ERROR_MSG(msg, ...) CLog::GetInstance()->Error(__FILE__, __FUNCTION__, __LINE__, msg, __VA_ARGS__);
+#define LOG_SHUTDOWN CLog::Release();

@@ -5,7 +5,6 @@ CPacket::CPacket()
 {
 }
 
-
 CPacket::~CPacket()
 {
 	if (_Buffer != NULL)

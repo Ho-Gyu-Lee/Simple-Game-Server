@@ -10,7 +10,7 @@ CLog::~CLog()
 {
 }
 
-void CLog::Trace(const char * msg, ...)
+void CLog::Log(const char * msg, ...)
 {
 	CSynchronized synchronized(&_LogSec);
 
@@ -20,7 +20,7 @@ void CLog::Trace(const char * msg, ...)
 	vsnprintf_s(buffer, LOG_BUFFER_SIZE, LOG_BUFFER_SIZE - 1, msg, args);
 	va_end(args);
 
-	std::cout << buffer << std::endl;
+	std::cout << CurrentDateTime() << " [INFO] " << buffer << std::endl;
 }
 
 void CLog::Error(const char * fileName, const char * funcName, int line, const char * msg, ...)
@@ -33,6 +33,17 @@ void CLog::Error(const char * fileName, const char * funcName, int line, const c
 	vsnprintf_s(buffer, LOG_BUFFER_SIZE, LOG_BUFFER_SIZE - 1, msg, args);
 	va_end(args);
 
-	std::cout << "File: " << fileName << "\nFunction: " << funcName << "\nLine: " << line \
+	std::cout << CurrentDateTime() << " [ERROR] " << "File: " << fileName << "\nFunction: " << funcName << "\nLine: " << line \
 		<< "\nError: " << buffer << std::endl;
+}
+
+std::string CLog::CurrentDateTime() 
+{
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), "%Y-%m-%d-%X", &tstruct);
+
+	return buf;
 }
