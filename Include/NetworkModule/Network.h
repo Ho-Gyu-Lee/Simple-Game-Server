@@ -20,8 +20,10 @@ public:
 	void Run();
 	void Release();
 
-private:
+public:
 	static void CALLBACK IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVOID Context, PVOID Overlapped, ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io);
+
+private:
 	bool GetLocalAddress(SOCKET socket, std::string& ip, u_short& port);
 
 public:

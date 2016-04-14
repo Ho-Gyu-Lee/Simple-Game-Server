@@ -17,8 +17,8 @@ typedef enum { OVERLAPPED_ACCEPT, OVERLAPPED_ZERO_READ, OVERLAPPED_READ, OVERLAP
 class CClientSession;
 typedef struct OVERLAPPED_BASE
 {
-	CClientSession* _Client;
 	OVERLAPPED		_Overlapped;			// Overlapped 구조체
 	OVERLAP_MODE	_Mode;					// Overlapped 모드
+	CClientSession* _Client;
 
 } OVERLAPPED_BASE, *LPOVERLAPPED_BASE;

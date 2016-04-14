@@ -24,9 +24,8 @@ bool CClientSessionManager::AcceptClientSessions(SOCKET listenSocket, TP_IO* io)
 	long count = _NumPostAccept;
 	for (long i = 0; i < count; ++i)
 	{
-		StartThreadpoolIo(io);
 		_ClientSessions.front()->Initailize();
-		_ClientSessions.front()->PostAccept(listenSocket);
+		_ClientSessions.front()->PostAccept(listenSocket, io);
 		_ClientSessions.pop();
 		InterlockedDecrement(&_NumPostAccept);
 	}

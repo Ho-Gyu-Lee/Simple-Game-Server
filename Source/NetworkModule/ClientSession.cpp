@@ -1,7 +1,11 @@
+#include "NetworkModule/Network.h"
+#include "NetworkModule/Packet.h"
 #include "NetworkModule/ClientSession.h"
 
 CClientSession::CClientSession()
 	: _Socket(INVALID_SOCKET)
+	, _TPIO(NULL)
+	, _EndBufferIndex(0)
 {
 
 }
@@ -20,6 +24,12 @@ void CClientSession::Initailize()
 	ZeroMemory(&_SendOverlapped,		sizeof(OVERLAPPED_BASE));
 	ZeroMemory(&_DisconnectOverlapped,	sizeof(OVERLAPPED_BASE));
 
+	_AcceptOverlapped._Client	  = this;
+	_ZeroReadOverlapped._Client   = this;
+	_ReadOverlapped._Client		  = this;
+	_SendOverlapped._Client		  = this;
+	_DisconnectOverlapped._Client = this;
+
 	_AcceptOverlapped._Mode		= OVERLAPPED_ACCEPT;
 	_ZeroReadOverlapped._Mode	= OVERLAPPED_ZERO_READ;
 	_ReadOverlapped._Mode		= OVERLAPPED_READ;
@@ -33,7 +43,24 @@ void CClientSession::Initailize()
 	}
 }
 
-bool CClientSession::PostAccept(SOCKET listenSocket)
+void CClientSession::RecviePacketProcessing(ULONG NumberOfBytesTransferred)
+{
+	ULONG remainderSize = 0;
+
+	CPacket* packet = new CPacket;
+	if (false == packet->Initailize(&_RecvBuffer[_EndBufferIndex], NumberOfBytesTransferred, &remainderSize))
+	{
+		return;
+	}
+
+	MoveMemory( &_RecvBuffer[_EndBufferIndex]
+			  , &_RecvBuffer[_EndBufferIndex + (NumberOfBytesTransferred - remainderSize)]
+			  , MAX_BUFFER_SIZE - (NumberOfBytesTransferred - remainderSize));
+
+	_EndBufferIndex += remainderSize;
+}
+
+bool CClientSession::PostAccept(SOCKET listenSocket, TP_IO* io)
 {
 	DWORD dwSize = 0;
 
@@ -41,6 +68,7 @@ bool CClientSession::PostAccept(SOCKET listenSocket)
 	WsaBuf.buf = NULL;
 	WsaBuf.len = 0;
 
+	StartThreadpoolIo(io);
 	if (FALSE == AcceptEx( listenSocket
 						 , _Socket
 					     , &WsaBuf
@@ -73,6 +101,12 @@ bool CClientSession::AcceptCompletion()
 		return false;
 	}
 
+	_TPIO = CreateThreadpoolIo(reinterpret_cast<HANDLE>(_Socket), CNetwork::IoCompletionCallback, NULL, NULL);
+	if (_TPIO == NULL)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -86,6 +120,7 @@ bool CClientSession::ZeroByteReceive()
 	WsaBuf.buf = NULL;
 	WsaBuf.len = 0;
 
+	StartThreadpoolIo(_TPIO);
 	int result = WSARecv( _Socket
 						, &WsaBuf
 						, 1
@@ -108,9 +143,10 @@ bool CClientSession::PostReceive()
 	DWORD dwFlag = 0;
 
 	WSABUF	WsaBuf;
-	WsaBuf.buf = (CHAR*)_RecvBuffer;
-	WsaBuf.len = MAX_BUFFER_SIZE;
+	WsaBuf.buf = &_RecvBuffer[_EndBufferIndex];
+	WsaBuf.len = MAX_BUFFER_SIZE - _EndBufferIndex;
 
+	StartThreadpoolIo(_TPIO);
 	int result = WSARecv( _Socket
 						, &WsaBuf
 						, 1
@@ -135,6 +171,7 @@ bool CClientSession::PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize)
 	WsaBuf.buf = pSendBuffer;
 	WsaBuf.len = dwSendBufferSize;
 
+	StartThreadpoolIo(_TPIO);
 	int result = WSASend( _Socket
 						, &WsaBuf
 						, 1
@@ -159,6 +196,13 @@ bool CClientSession::Release()
 	{
 		closesocket(_Socket);
 		return false;
+	}
+
+	if (_TPIO != NULL)
+	{
+		WaitForThreadpoolIoCallbacks(_TPIO, true);
+		CloseThreadpoolIo(_TPIO);
+		_TPIO = NULL;
 	}
 
 	return true;

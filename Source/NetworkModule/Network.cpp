@@ -1,7 +1,7 @@
-#include "NetworkModule/IOCompletionPort.h"
+#include "NetworkModule\IOCompletionPort.h"
 #include "NetworkModule\ClientSession.h"
 #include "NetworkModule\ClientSessionManager.h"
-#include "NetworkModule/Network.h"
+#include "NetworkModule\Network.h"
 
 CNetwork::CNetwork()
 	: _ListenSocket(INVALID_SOCKET)
@@ -97,9 +97,12 @@ void CALLBACK CNetwork::IoCompletionCallback(PTP_CALLBACK_INSTANCE Instance, PVO
 			overlapped_Base->_Client->PostReceive();
 			break;
 		case OVERLAPPED_READ:
+			overlapped_Base->_Client->RecviePacketProcessing(NumberOfBytesTransferred);
 			overlapped_Base->_Client->ZeroByteReceive();
 			break;
 		case OVERLAPPED_WRITE:
+			break;
+		case OVERLAPPED_DISCONNECT:
 			break;
 		default:
 			break;
