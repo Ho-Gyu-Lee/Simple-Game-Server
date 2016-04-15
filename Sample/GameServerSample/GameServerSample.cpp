@@ -2,13 +2,20 @@
 //
 
 #include "stdafx.h"
+
 #include "NetworkCommon\Log.h"
+#include "NetworkCommon\ConcurrentQueue.h"
+
 #include "NetworkModule\Network.h"
 #include "NetworkModule\ClientSession.h"
 #include "NetworkModule\ClientSessionManager.h"
 
 int main()
 {
+	CConcurrentQueue<CClientSession*> clientSessionQueue;
+
+	clientSessionQueue.Push(new CClientSession);
+
 	CClientSessionManager* clientSessionManager = new CClientSessionManager;
 
 	for (int i = 0; i < MAX_CONNECTION; ++i)

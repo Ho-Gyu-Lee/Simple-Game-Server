@@ -10,12 +10,24 @@ private:
 	CSectionObject	_PushSec;
 	CSectionObject	_PopSec;
 
-public:
-	void Push(T value);
-	T Pop();
+	DWORD _Size;
 
 public:
-	CConcurrentQueue() {}
+	void Push(T value)
+	{
+		CSynchronized synchronized(&_PushSec);
+		_QueueData.push(value);
+		InterlockedExchangeAdd(&_Size, 1);
+	}
+
+	T Pop()
+	{
+		CSynchronized synchronized(&_PopSec);
+		InterlockedDecrement(&_Size);
+		return _QueueData.pop();
+	}
+
+public:
+	CConcurrentQueue(): _Size(0) {}
 	~CConcurrentQueue() {}
 };
-
