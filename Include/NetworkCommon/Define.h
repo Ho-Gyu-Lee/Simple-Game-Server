@@ -2,6 +2,7 @@
 
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"mswsock.lib")
+#pragma comment(lib,"DbgHelp.Lib")
 
 #include <winsock2.h>
 #include <mswsock.h>
@@ -10,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <time.h>
+#include <Ws2tcpip.h>
 
 #define MAX_CONNECTION	10000
 #define MAX_BUFFER_SIZE 1024

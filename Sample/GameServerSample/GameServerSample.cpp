@@ -4,7 +4,7 @@
 #include "stdafx.h"
 
 #include "NetworkCommon\Log.h"
-#include "NetworkCommon\ConcurrentQueue.h"
+#include "NetworkCommon\MiniDumpHelp.h"
 
 #include "NetworkModule\Network.h"
 #include "NetworkModule\ClientSession.h"
@@ -12,9 +12,7 @@
 
 int main()
 {
-	CConcurrentQueue<CClientSession*> clientSessionQueue;
-
-	clientSessionQueue.Push(new CClientSession);
+	CMiniDumpHelp::GetInstance()->Initailize();
 
 	CClientSessionManager* clientSessionManager = new CClientSessionManager;
 
@@ -22,16 +20,14 @@ int main()
 	{
 		clientSessionManager->PushClientSession(new CClientSession);
 	}
-
-	CNetwork* network = new CNetwork;
 	
-	if (false == network->Initialize(20020, clientSessionManager))
+	if (false == CNetwork::GetInstance()->Initialize(20000, clientSessionManager))
 	{
 		LOG_ERROR_MSG("Failed Server Initialize");
 	}
 
 	LOG_MSG("Start Server");
-	network->Run();
+	CNetwork::GetInstance()->Run();
 
 	LOG_SHUTDOWN;
 

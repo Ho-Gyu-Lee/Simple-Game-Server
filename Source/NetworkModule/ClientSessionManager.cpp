@@ -3,31 +3,36 @@
 
 
 CClientSessionManager::CClientSessionManager()
-	: _NumPostAccept(0)
 {
 }
 
 
 CClientSessionManager::~CClientSessionManager()
 {
-
+	while (_ClientSessions.Empty() == false)
+	{
+		delete _ClientSessions.Pop();
+	}
 }
 
 void CClientSessionManager::PushClientSession(CClientSession* client)
 {
-	_ClientSessions.push(client);
-	InterlockedExchangeAdd(&_NumPostAccept, 1);
+	_ClientSessions.Push(client);
 }
 
 bool CClientSessionManager::AcceptClientSessions(SOCKET listenSocket, TP_IO* io)
 {
-	long count = _NumPostAccept;
-	for (long i = 0; i < count; ++i)
+	int count = _ClientSessions.Size();
+
+	if (count <= 0) return true;
+
+	for (int i = 0; i < count; ++i)
 	{
-		_ClientSessions.front()->Initailize();
-		_ClientSessions.front()->PostAccept(listenSocket, io);
-		_ClientSessions.pop();
-		InterlockedDecrement(&_NumPostAccept);
+		CClientSession* client = _ClientSessions.Pop();
+
+		client->Initailize();
+		if (false == client->PostAccept(listenSocket, io))
+			_ClientSessions.Push(client);
 	}
 
 	return true;

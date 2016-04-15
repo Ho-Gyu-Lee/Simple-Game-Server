@@ -7,27 +7,34 @@ class CConcurrentQueue
 {
 private:
 	std::queue<T>	_QueueData;
-	CSectionObject	_PushSec;
-	CSectionObject	_PopSec;
-
-	DWORD _Size;
+	CSectionObject	_QueueSec;
 
 public:
-	void Push(T value)
+	inline void Push(T value)
 	{
-		CSynchronized synchronized(&_PushSec);
+		CSynchronized synchronized(&_QueueSec);
 		_QueueData.push(value);
-		InterlockedExchangeAdd(&_Size, 1);
 	}
 
-	T Pop()
+	inline T Pop()
 	{
-		CSynchronized synchronized(&_PopSec);
-		InterlockedDecrement(&_Size);
-		return _QueueData.pop();
+		CSynchronized synchronized(&_QueueSec);
+		T value = _QueueData.front();
+		_QueueData.pop();
+		return value;
+	}
+
+	inline bool Empty()
+	{
+		return _QueueData.empty();
+	}
+
+	inline int Size()
+	{
+		return _QueueData.size();
 	}
 
 public:
-	CConcurrentQueue(): _Size(0) {}
+	CConcurrentQueue() {}
 	~CConcurrentQueue() {}
 };

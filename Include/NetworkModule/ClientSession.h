@@ -33,7 +33,9 @@ public:
 	bool PostReceive();
 	bool PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize);
 	void SendCompletion(PVOID overlapped);
-	bool Release();
+	bool PostDisconnect();
+	void DisconnectCompletion();
+	void Release();
 
 public:
 	void RecviePacketProcessing(ULONG NumberOfBytesTransferred);

@@ -149,6 +149,7 @@
     <ClInclude Include="..\..\Include\NetworkCommon\DataBuffer.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Define.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Log.h" />
+    <ClInclude Include="..\..\Include\NetworkCommon\MiniDumpHelp.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Singleton.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\SRWLock.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Synchronized.h" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Source\NetworkCommon\DataBuffer.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\Log.cpp" />
+    <ClCompile Include="..\..\Source\NetworkCommon\MiniDumpHelp.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\SRWLock.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\Synchronized.cpp" />
   </ItemGroup>

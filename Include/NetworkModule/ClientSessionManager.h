@@ -1,12 +1,12 @@
 #pragma once
 #include "NetworkCommon\Define.h"
+#include "NetworkCommon\ConcurrentQueue.h"
 
 class CClientSession;
 class CClientSessionManager
 {
 private:
-	std::queue<CClientSession*> _ClientSessions;
-	volatile long _NumPostAccept;
+	CConcurrentQueue<CClientSession*> _ClientSessions;
 
 public:
 	void PushClientSession(CClientSession* client);

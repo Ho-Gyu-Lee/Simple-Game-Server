@@ -34,42 +34,14 @@ void CClientSession::Initailize()
 	_ReadOverlapped._Mode		= OVERLAPPED_READ;
 	_DisconnectOverlapped._Mode = OVERLAPPED_DISCONNECT;
 
-	_Socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (_Socket == INVALID_SOCKET)
 	{
-		LOG_ERROR_MSG("Failed Socket Initailize")
-	}
-}
-
-void CClientSession::RecviePacketProcessing(ULONG NumberOfBytesTransferred)
-{
-	// 에코 처리 ( 추후 CPacket Class를 이용하여 처리 작업 추가 )
-	LONG packetSize = NumberOfBytesTransferred;
-	while (true)
-	{
-		if (packetSize == 0) break;
-
-		CHAR* sendBuffer = new CHAR[8];
-		CopyMemory(sendBuffer, &_RecvBuffer[_EndBufferIndex], 8);
-
-		PostSend(sendBuffer, 8);
-
-		_EndBufferIndex += 8;
-		packetSize		-= 8;
-
-		if (packetSize < 0)
+		_Socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+		if (_Socket == INVALID_SOCKET)
 		{
-			_EndBufferIndex -= 8;
-			packetSize		+= 8;
-			break;
+			LOG_ERROR_MSG("Failed Socket Initailize")
 		}
 	}
-	 
-	MoveMemory( _RecvBuffer
-			  , &_RecvBuffer[_EndBufferIndex]
-			  , MAX_BUFFER_SIZE - _EndBufferIndex);
-
-	_EndBufferIndex = packetSize;
 }
 
 bool CClientSession::PostAccept(SOCKET listenSocket, TP_IO* io)
@@ -175,6 +147,37 @@ bool CClientSession::PostReceive()
 	return true;
 }
 
+void CClientSession::RecviePacketProcessing(ULONG NumberOfBytesTransferred)
+{
+	// 에코 처리 ( 추후 CPacket Class를 이용하여 처리 작업 추가 )
+	LONG packetSize = NumberOfBytesTransferred;
+	while (true)
+	{
+		if (packetSize == 0) break;
+
+		CHAR* sendBuffer = new CHAR[8];
+		CopyMemory(sendBuffer, &_RecvBuffer[_EndBufferIndex], 8);
+
+		PostSend(sendBuffer, 8);
+
+		_EndBufferIndex += 8;
+		packetSize -= 8;
+
+		if (packetSize < 0)
+		{
+			_EndBufferIndex -= 8;
+			packetSize += 8;
+			break;
+		}
+	}
+
+	MoveMemory(_RecvBuffer
+		, &_RecvBuffer[_EndBufferIndex]
+		, MAX_BUFFER_SIZE - _EndBufferIndex);
+
+	_EndBufferIndex = packetSize;
+}
+
 bool CClientSession::PostSend(CHAR* pSendBuffer, DWORD dwSendBufferSize)
 {
 	DWORD dwSize = 0;
@@ -215,8 +218,10 @@ void CClientSession::SendCompletion(PVOID overlapped)
 	delete sendOverlapped;
 }
 
-bool CClientSession::Release()
+bool CClientSession::PostDisconnect()
 {
+	/*
+	StartThreadpoolIo(_TPIO);
 	bool result = TransmitFile(_Socket, NULL, NULL, NULL, (LPOVERLAPPED)&_DisconnectOverlapped, NULL, TF_DISCONNECT | TF_REUSE_SOCKET);
 
 	if (result == false)
@@ -224,13 +229,22 @@ bool CClientSession::Release()
 		closesocket(_Socket);
 		return false;
 	}
+	*/
+	
+	return true;
+}
 
+void CClientSession::DisconnectCompletion()
+{
+	Release();
+}
+
+void CClientSession::Release()
+{
 	if (_TPIO != NULL)
 	{
 		WaitForThreadpoolIoCallbacks(_TPIO, true);
 		CloseThreadpoolIo(_TPIO);
 		_TPIO = NULL;
 	}
-
-	return true;
 }
