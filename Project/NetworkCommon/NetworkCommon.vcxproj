@@ -145,6 +145,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\NetworkCommon\ConcurrentQueue.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\DataBuffer.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Define.h" />
     <ClInclude Include="..\..\Include\NetworkCommon\Log.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="..\..\Include\NetworkCommon\Synchronized.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\NetworkCommon\ConcurrentQueue.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\DataBuffer.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\Log.cpp" />
     <ClCompile Include="..\..\Source\NetworkCommon\SRWLock.cpp" />
